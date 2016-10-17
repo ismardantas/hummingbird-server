@@ -9,4 +9,15 @@ RSpec.configure do |config|
     Chewy.client.cluster.health wait_for_status: 'yellow', timeout: '10s'
     Chewy::Index.descendants.each(&:purge!)
   end
+  config.around(:example, elasticsearch: true) do |example|
+    puts `free`
+    puts `df -h`
+    begin
+      example.run
+    rescue
+      puts `free`
+      puts `df -h`
+      raise
+    end
+  end
 end
